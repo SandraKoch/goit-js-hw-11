@@ -22,10 +22,10 @@ function handleResults(results, reset) {
     Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
-  } else if (results.length <= results.totalHits) {
-    // console.log('displayImg');
-    displayImages(results);
   }
+  // } else if (results.length <= results.totalHits) {
+  // console.log('displayImg');
+  displayImages(results);
 }
 
 function displayImages(results) {
@@ -81,6 +81,7 @@ async function searchImages(query, page) {
     );
     // console.log('response', response);
     const imagesArray = response.data.hits;
+    const totalHits = response.data.total;
     // console.log('imagesArray', imagesArray);
     const mappedArr = imagesArray.map(image => {
       return {
@@ -93,6 +94,9 @@ async function searchImages(query, page) {
         downloads: image.downloads,
       };
     });
+    if (page === 1) {
+      Notify.success(`Hooray! We found ${totalHits} images.`);
+    }
     return mappedArr;
   } catch (error) {
     console.log('Error in try ... catch', error.toString());
@@ -102,7 +106,7 @@ async function searchImages(query, page) {
 searchFormEl.addEventListener('submit', async e => {
   e.preventDefault();
   const trimmedInputValue = inputEl.value.trim();
-  const foundImages = await searchImages(trimmedInputValue, PAGE, PER_PAGE);
+  const foundImages = await searchImages(trimmedInputValue, PAGE);
   console.log('foundImages', foundImages);
   handleResults(foundImages, true);
 });
