@@ -1,9 +1,13 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import SimpleLightbox from 'simplelightbox';
+// const SimpleLightbox = window.SimpleLightbox;
+import 'simplelightbox/dist/simple-lightbox.min.css';
 import axios from 'axios';
 
 const searchFormEl = document.querySelector('#search-form');
 const inputEl = document.querySelector('[name="searchQuery"]');
 const imagesContainerEl = document.querySelector('.gallery');
+const loadMoreButtonEl = document.querySelector('.load-more');
 
 function handleResults(results) {
   imagesContainerEl.innerHTML = '';
@@ -21,6 +25,7 @@ function displayImages(results) {
     // console.log(result);
 
     const resultSrc = result.webformatURL;
+    const resultLargeImg = result.largeImageURL;
     const resultAlt = result.tags;
     const resultLikes = result.likes;
     const resultViews = result.views;
@@ -31,23 +36,31 @@ function displayImages(results) {
     instance.classList.add('photo-card');
     instance.insertAdjacentHTML(
       'beforeend',
-      `<img src="${resultSrc}" alt="${resultAlt}" loading="lazy" />
+      `<a href="${resultLargeImg}" class="gallery__link">
+      <img src="${resultSrc}" alt="${resultAlt}" class="gallery__image" loading="lazy" />
+      </a>
     <div class="info">
-      <p class="info-item">
+      <p class="info__item">
         <b>Likes</b>${resultLikes}
       </p>
-      <p class="info-item">
+      <p class="info__item">
         <b>Views</b>${resultViews}
       </p>
-      <p class="info-item">
+      <p class="info__item">
         <b>Comments</b>${resultComments}
       </p>
-      <p class="info-item">
+      <p class="info__item">
         <b>Downloads</b>${resultDownloads}
       </p>
     </div>`
     );
     imagesContainerEl.append(instance);
+  });
+
+  new SimpleLightbox('.gallery a', {
+    captions: true,
+    captionsData: 'alt',
+    captionDelay: 250,
   });
 }
 
@@ -83,3 +96,12 @@ searchFormEl.addEventListener('submit', async e => {
   console.log('foundImages', foundImages);
   handleResults(foundImages);
 });
+
+// lightbox.on('show.simplelightbox', () => {
+//   document.body.classList.add('show-lightbox');
+// });
+// lightbox.on('close.simplelightbox', () => {
+//   document.body.classList.remove('show-lightbox');
+// });
+
+// loadMoreButtonEl.addEventListener('click');
