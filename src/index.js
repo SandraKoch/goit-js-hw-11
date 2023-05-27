@@ -9,6 +9,8 @@ const inputEl = document.querySelector('[name="searchQuery"]');
 const imagesContainerEl = document.querySelector('.gallery');
 const loadMoreButtonEl = document.querySelector('.load-more');
 
+loadMoreButtonEl.hidden = true;
+
 function handleResults(results) {
   imagesContainerEl.innerHTML = '';
   if (results.length === 0) {
@@ -62,12 +64,14 @@ function displayImages(results) {
     captionsData: 'alt',
     captionDelay: 250,
   });
+
+  loadMoreButtonEl.hidden = false;
 }
 
 async function searchImages(query) {
   try {
     const response = await axios.get(
-      `https://pixabay.com/api/?key=36788203-2c78e2a924ca1cc7e222b7ed9&image_type=photo&orientation=horizontal&q=${query}&safesearch=true&per_page=20&page=1`
+      `https://pixabay.com/api/?key=36788203-2c78e2a924ca1cc7e222b7ed9&image_type=photo&orientation=horizontal&q=${query}&safesearch=true&per_page=40&page=1`
     );
     // console.log('response', response);
     const imagesArray = response.data.hits;
@@ -97,11 +101,4 @@ searchFormEl.addEventListener('submit', async e => {
   handleResults(foundImages);
 });
 
-// lightbox.on('show.simplelightbox', () => {
-//   document.body.classList.add('show-lightbox');
-// });
-// lightbox.on('close.simplelightbox', () => {
-//   document.body.classList.remove('show-lightbox');
-// });
-
-// loadMoreButtonEl.addEventListener('click');
+loadMoreButtonEl.addEventListener('click');
