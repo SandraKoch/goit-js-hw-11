@@ -3,6 +3,20 @@
   --animation-duration: 250ms;
 }
 
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.search-form {
+  padding: 10px;
+  font-size: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background-color: rgb(38, 114, 244);
+}
+
 .gallery {
   display: grid;
   max-width: 1280px;
@@ -10,7 +24,7 @@
   grid-auto-rows: 310px;
   grid-gap: 12px;
   justify-content: center;
-  padding: 0;
+  padding: 10px 0;
   list-style: none;
   margin-left: auto;
   margin-right: auto;

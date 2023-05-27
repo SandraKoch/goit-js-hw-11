@@ -8,18 +8,24 @@ const searchFormEl = document.querySelector('#search-form');
 const inputEl = document.querySelector('[name="searchQuery"]');
 const imagesContainerEl = document.querySelector('.gallery');
 const loadMoreButtonEl = document.querySelector('.load-more');
+let PAGE = 1;
+let PER_PAGE = 40;
 
 loadMoreButtonEl.hidden = true;
 
-function handleResults(results) {
-  imagesContainerEl.innerHTML = '';
+function handleResults(results, reset) {
+  if (reset === true) {
+    imagesContainerEl.innerHTML = '';
+  }
+
   if (results.length === 0) {
     Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
+  } else if (results.length <= results.totalHits) {
+    // console.log('displayImg');
+    displayImages(results);
   }
-  // console.log('displayImg');
-  displayImages(results);
 }
 
 function displayImages(results) {
@@ -68,10 +74,10 @@ function displayImages(results) {
   loadMoreButtonEl.hidden = false;
 }
 
-async function searchImages(query) {
+async function searchImages(query, page) {
   try {
     const response = await axios.get(
-      `https://pixabay.com/api/?key=36788203-2c78e2a924ca1cc7e222b7ed9&image_type=photo&orientation=horizontal&q=${query}&safesearch=true&per_page=40&page=1`
+      `https://pixabay.com/api/?key=36788203-2c78e2a924ca1cc7e222b7ed9&image_type=photo&orientation=horizontal&q=${query}&safesearch=true&per_page=40&page=${page}`
     );
     // console.log('response', response);
     const imagesArray = response.data.hits;
@@ -96,9 +102,16 @@ async function searchImages(query) {
 searchFormEl.addEventListener('submit', async e => {
   e.preventDefault();
   const trimmedInputValue = inputEl.value.trim();
-  const foundImages = await searchImages(trimmedInputValue);
+  const foundImages = await searchImages(trimmedInputValue, PAGE, PER_PAGE);
   console.log('foundImages', foundImages);
-  handleResults(foundImages);
+  handleResults(foundImages, true);
 });
 
-loadMoreButtonEl.addEventListener('click');
+loadMoreButtonEl.addEventListener('click', async e => {
+  // e.preventDefault();
+  PAGE += 1;
+  const trimmedInputValue = inputEl.value.trim();
+  const loadMoreImages = await searchImages(trimmedInputValue, PAGE);
+  console.log('loadMoreImages', loadMoreImages);
+  handleResults(loadMoreImages, false);
+});
