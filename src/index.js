@@ -9,7 +9,7 @@ const inputEl = document.querySelector('[name="searchQuery"]');
 const imagesContainerEl = document.querySelector('.gallery');
 const loadMoreButtonEl = document.querySelector('.load-more');
 let PAGE = 1;
-const PER_PAGE = 100;
+const PER_PAGE = 40;
 
 loadMoreButtonEl.hidden = true;
 
