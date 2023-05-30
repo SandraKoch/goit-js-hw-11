@@ -9,7 +9,7 @@ const inputEl = document.querySelector('[name="searchQuery"]');
 const imagesContainerEl = document.querySelector('.gallery');
 const loadMoreButtonEl = document.querySelector('.load-more');
 let PAGE = 1;
-let PER_PAGE = 40;
+const PER_PAGE = 100;
 
 loadMoreButtonEl.hidden = true;
 
@@ -18,14 +18,17 @@ function handleResults(results, reset) {
     imagesContainerEl.innerHTML = '';
   }
 
-  if (results.length === 0) {
+  if (results.length) {
+    displayImages(results);
+  } else {
     Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
+
+    loadMoreButtonEl.hidden = true;
   }
   // } else if (results.length <= results.totalHits) {
   // console.log('displayImg');
-  displayImages(results);
 }
 
 function displayImages(results) {
@@ -77,27 +80,39 @@ function displayImages(results) {
 async function searchImages(query, page) {
   try {
     const response = await axios.get(
-      `https://pixabay.com/api/?key=36788203-2c78e2a924ca1cc7e222b7ed9&image_type=photo&orientation=horizontal&q=${query}&safesearch=true&per_page=40&page=${page}`
+      `https://pixabay.com/api/?key=36788203-2c78e2a924ca1cc7e222b7ed9&image_type=photo&orientation=horizontal&q=${query}&safesearch=true&per_page=${PER_PAGE}&page=${page}`
     );
     // console.log('response', response);
     const imagesArray = response.data.hits;
-    const totalHits = response.data.total;
+    const userAvailableHits = response.data.total;
+    const totalHits = response.data.totalHits;
     // console.log('imagesArray', imagesArray);
-    const mappedArr = imagesArray.map(image => {
-      return {
-        webformatURL: image.webformatURL,
-        largeImageURL: image.largeImageURL,
-        tags: image.tags,
-        likes: image.likes,
-        views: image.views,
-        comments: image.comments,
-        downloads: image.downloads,
-      };
-    });
-    if (page === 1) {
-      Notify.success(`Hooray! We found ${totalHits} images.`);
+    if (totalHits > 0 && page === 1) {
+      Notify.success(`Hooray! We found ${userAvailableHits} images.`);
     }
-    return mappedArr;
+    console.log('page * PER_PAGE <= totalHits', page * PER_PAGE, totalHits);
+    if (page * PER_PAGE <= totalHits) {
+      const mappedArr = imagesArray.map(image => {
+        return {
+          webformatURL: image.webformatURL,
+          largeImageURL: image.largeImageURL,
+          tags: image.tags,
+          likes: image.likes,
+          views: image.views,
+          comments: image.comments,
+          downloads: image.downloads,
+        };
+      });
+      return mappedArr;
+    } else {
+      Notify.failure(
+        "We're sorry, but you've reached the end of search results."
+      );
+
+      loadMoreButtonEl.hidden = true;
+
+      return undefined;
+    }
   } catch (error) {
     console.log('Error in try ... catch', error.toString());
   }
@@ -105,10 +120,14 @@ async function searchImages(query, page) {
 
 searchFormEl.addEventListener('submit', async e => {
   e.preventDefault();
+  PAGE = 1;
   const trimmedInputValue = inputEl.value.trim();
   const foundImages = await searchImages(trimmedInputValue, PAGE);
   console.log('foundImages', foundImages);
-  handleResults(foundImages, true);
+
+  if (foundImages) {
+    handleResults(foundImages, true);
+  }
 });
 
 loadMoreButtonEl.addEventListener('click', async e => {
@@ -117,5 +136,18 @@ loadMoreButtonEl.addEventListener('click', async e => {
   const trimmedInputValue = inputEl.value.trim();
   const loadMoreImages = await searchImages(trimmedInputValue, PAGE);
   console.log('loadMoreImages', loadMoreImages);
-  handleResults(loadMoreImages, false);
+
+  if (loadMoreImages) {
+    handleResults(loadMoreImages, false);
+  }
 });
+
+// smooth scroll
+//  const { height: cardHeight } = document
+//  .querySelector('.gallery')
+//  .firstElementChild.getBoundingClientRect();
+
+// window.scrollBy({
+//  top: cardHeight * 2,
+//  behavior: 'smooth',
+// });
