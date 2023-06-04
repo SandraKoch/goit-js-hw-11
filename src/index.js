@@ -131,8 +131,6 @@ searchFormEl.addEventListener('submit', async e => {
 });
 
 loadMoreButtonEl.addEventListener('click', async e => {
-  // e.preventDefault();
-
   PAGE += 1;
   const trimmedInputValue = inputEl.value.trim();
   const loadMoreImages = await searchImages(trimmedInputValue, PAGE);
