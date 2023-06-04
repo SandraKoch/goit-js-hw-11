@@ -1,6 +1,5 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
-// const SimpleLightbox = window.SimpleLightbox;
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import axios from 'axios';
 
@@ -8,6 +7,11 @@ const searchFormEl = document.querySelector('#search-form');
 const inputEl = document.querySelector('[name="searchQuery"]');
 const imagesContainerEl = document.querySelector('.gallery');
 const loadMoreButtonEl = document.querySelector('.load-more');
+let simpleLightboxGallery = new SimpleLightbox('.gallery a', {
+  captions: true,
+  captionsData: 'alt',
+  captionDelay: 250,
+});
 let PAGE = 1;
 const PER_PAGE = 40;
 
@@ -68,11 +72,7 @@ function displayImages(results) {
     imagesContainerEl.append(instance);
   });
 
-  new SimpleLightbox('.gallery a', {
-    captions: true,
-    captionsData: 'alt',
-    captionDelay: 250,
-  });
+  simpleLightboxGallery.refresh();
 
   loadMoreButtonEl.hidden = false;
 }
@@ -132,6 +132,7 @@ searchFormEl.addEventListener('submit', async e => {
 
 loadMoreButtonEl.addEventListener('click', async e => {
   // e.preventDefault();
+
   PAGE += 1;
   const trimmedInputValue = inputEl.value.trim();
   const loadMoreImages = await searchImages(trimmedInputValue, PAGE);

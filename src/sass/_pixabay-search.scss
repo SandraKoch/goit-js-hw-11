@@ -17,6 +17,10 @@
   background-color: rgb(38, 114, 244);
 }
 
+.search-form input {
+  outline: none;
+}
+
 .gallery {
   display: grid;
   max-width: 1280px;
